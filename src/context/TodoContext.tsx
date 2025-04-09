@@ -70,18 +70,15 @@ const todoReducer = (state: TodoState, action: TodoAction): TodoState => {
 export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [state, dispatch] = useReducer(todoReducer, initialState);
-
-  useEffect(() => {
+  const [state, dispatch] = useReducer(todoReducer, initialState, () => {
     const savedTodos = localStorage.getItem('todos');
     const savedTheme = localStorage.getItem('theme');
-    if (savedTodos) {
-      dispatch({ type: 'ADD_TODO', payload: JSON.parse(savedTodos) });
-    }
-    if (savedTheme) {
-      dispatch({ type: 'TOGGLE_THEME' });
-    }
-  }, []);
+    return {
+      ...initialState,
+      todos: savedTodos ? JSON.parse(savedTodos) : [],
+      theme: savedTheme === 'dark' ? 'dark' : 'light',
+    };
+  });
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(state.todos));
